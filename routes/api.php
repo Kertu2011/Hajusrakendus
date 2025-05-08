@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WeatherController; 
+use App\Http\Controllers\MarkerController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -10,3 +11,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/weather', [WeatherController::class, 'getWeather']); 
+
+
+
+
+
