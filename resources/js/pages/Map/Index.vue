@@ -1,80 +1,86 @@
 <template>
     <Head title="Map" />
-    <div class="container mx-auto p-4">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">OpenStreetMap Markers</h1>
-      </div>
-  
-      <div v-if="successMessage"
-           class="flex items-center mb-4 p-4 bg-green-100 text-green-700 border border-green-300 rounded-lg shadow">
-        <InformationCircleIcon class="h-6 w-6 mr-3 text-green-600 flex-shrink-0" />
-        <span>{{ successMessage }}</span>
-      </div>
-  
-      <div ref="mapContainer" style="height: 60vh; z-index: 1;" class="mb-6 border border-gray-300 rounded-lg shadow-lg"></div>
-  
-      <!-- Modal for adding/editing marker -->
-      <div v-if="showAddMarkerModal || showEditMarkerModal"
-     class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center p-4 overflow-y-auto"
-     style="z-index: 1000;">
-  <div class="relative bg-white p-6 rounded-lg shadow-xl w-full max-w-lg"
-       style="z-index: 1001;"
-       @click.stop>
-        <button @click="closeModal"
-                  class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
-            <XMarkIcon class="h-7 w-7" />
-          </button>
-          <h3 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-            <MapPinIcon v-if="!showEditMarkerModal" class="h-6 w-6 mr-2 text-blue-600" />
-            <PencilSquareIcon v-if="showEditMarkerModal" class="h-6 w-6 mr-2 text-yellow-500" />
-            {{ showEditMarkerModal ? 'Edit Marker' : 'Add New Marker' }}
-          </h3>
-          <form @submit.prevent="submitMarker" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Name (Optional)</label>
-              <input type="text" 
-       v-model="form.name"
-       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-
-              <p v-if="form.errors.name" class="text-sm text-red-600 mt-1">{{ form.errors.name }}</p>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
+    <div class="min-h-screen bg-slate-50">
+      <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <div class="flex justify-between items-center mb-8">
+          <h1 class="text-3xl sm:text-4xl font-bold text-slate-800 tracking-tight">OpenStreetMap Markers</h1>
+        </div>
+    
+        <div v-if="successMessage"
+             class="flex items-center mb-6 p-4 bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-lg shadow-md">
+          <InformationCircleIcon class="h-6 w-6 mr-3 text-emerald-600 flex-shrink-0" />
+          <span>{{ successMessage }}</span>
+        </div>
+    
+        <div ref="mapContainer" style="height: 60vh; z-index: 1;" class="mb-8 border border-slate-300 rounded-xl shadow-xl overflow-hidden"></div>
+    
+        <!-- Modal for adding/editing marker -->
+        <div v-if="showAddMarkerModal || showEditMarkerModal"
+           class="fixed inset-0 bg-black/60 flex justify-center items-center p-4 overflow-y-auto"
+           style="z-index: 1000;">
+          <div class="relative bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-lg transform transition-all"
+               style="z-index: 1001;"
+               @click.stop> 
+            <button @click="closeModal"
+                    class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-full hover:bg-slate-100"> 
+              <XMarkIcon class="h-6 w-6" />
+            </button>
+            <h3 class="text-2xl font-semibold text-slate-800 mb-6 pb-4 border-b border-slate-200 flex items-center">
+              <MapPinIcon v-if="!showEditMarkerModal" class="h-7 w-7 mr-2.5 text-sky-600" />
+              <PencilSquareIcon v-if="showEditMarkerModal" class="h-7 w-7 mr-2.5 text-amber-500" />
+              {{ showEditMarkerModal ? 'Edit Marker' : 'Add New Marker' }}
+            </h3>
+            <form @submit.prevent="submitMarker" class="space-y-5">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
-                <input type="number" step="any" v-model.number="form.latitude" readonly
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 sm:text-sm cursor-not-allowed" />
-                <p v-if="form.errors.latitude" class="text-sm text-red-600 mt-1">{{ form.errors.latitude }}</p>
+                <label for="markerName" class="block text-sm font-medium text-slate-700 mb-1.5">Name (Optional)</label>
+                <input type="text" id="markerName"
+                       v-model="form.name"
+                       placeholder="E.g., Home, Office, Favorite Park"
+                       class="mt-1 block w-full px-3.5 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 sm:text-sm text-slate-900 placeholder-slate-400" />
+                <p v-if="form.errors.name" class="text-xs text-red-500 mt-1.5">{{ form.errors.name }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="markerLat" class="block text-sm font-medium text-slate-700 mb-1.5">Latitude</label>
+                  <input type="number" id="markerLat" step="any" v-model.number="form.latitude" readonly
+                         class="mt-1 block w-full px-3.5 py-2.5 border border-slate-300 rounded-lg bg-slate-100 text-slate-600 sm:text-sm cursor-not-allowed focus:ring-0 focus:border-slate-300" />
+                  <p v-if="form.errors.latitude" class="text-xs text-red-500 mt-1.5">{{ form.errors.latitude }}</p>
+                </div>
+                <div>
+                  <label for="markerLng" class="block text-sm font-medium text-slate-700 mb-1.5">Longitude</label>
+                  <input type="number" id="markerLng" step="any" v-model.number="form.longitude" readonly
+                         class="mt-1 block w-full px-3.5 py-2.5 border border-slate-300 rounded-lg bg-slate-100 text-slate-600 sm:text-sm cursor-not-allowed focus:ring-0 focus:border-slate-300" />
+                  <p v-if="form.errors.longitude" class="text-xs text-red-500 mt-1.5">{{ form.errors.longitude }}</p>
+                </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
-                <input type="number" step="any" v-model.number="form.longitude" readonly
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700 sm:text-sm cursor-not-allowed" />
-                <p v-if="form.errors.longitude" class="text-sm text-red-600 mt-1">{{ form.errors.longitude }}</p>
+                <label for="markerDesc" class="block text-sm font-medium text-slate-700 mb-1.5">Description (Optional)</label>
+                <textarea id="markerDesc" v-model="form.description" 
+                          rows="4"
+                          placeholder="Any details about this marker..."
+                          class="mt-1 block w-full px-3.5 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 sm:text-sm text-slate-900 placeholder-slate-400">
+                </textarea>
+                <p v-if="form.errors.description" class="text-xs text-red-500 mt-1.5">{{ form.errors.description }}</p>
               </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
-              <textarea v-model="form.description" 
-          rows="3"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-</textarea>
-              <p v-if="form.errors.description" class="text-sm text-red-600 mt-1">{{ form.errors.description }}</p>
-            </div>
-            <div class="flex justify-end space-x-3 pt-2">
-              <button type="button" @click="closeModal"
-                      class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                Cancel
-              </button>
-              <button type="submit" :disabled="form.processing"
-                      class="inline-flex items-center px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                      :class="{'bg-blue-600 hover:bg-blue-700': !showEditMarkerModal, 'bg-yellow-500 hover:bg-yellow-600': showEditMarkerModal}">
-                <ArrowPathIcon v-if="form.processing" class="animate-spin h-5 w-5 mr-2" />
-                <CheckCircleIcon v-if="!form.processing && showEditMarkerModal" class="h-5 w-5 mr-2" />
-                <MapPinIcon v-if="!form.processing && !showEditMarkerModal" class="h-5 w-5 mr-2" />
-                <span>{{ form.processing ? 'Saving...' : (showEditMarkerModal ? 'Save Changes' : 'Add Marker') }}</span>
-              </button>
-            </div>
-          </form>
+              <div class="flex justify-end space-x-3 pt-6 mt-6 border-t border-slate-200">
+                <button type="button" @click="closeModal"
+                        class="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" :disabled="form.processing"
+                        class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white border border-transparent rounded-lg shadow-sm disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                        :class="{
+                          'bg-sky-600 hover:bg-sky-700 focus:ring-sky-500': !showEditMarkerModal,
+                          'bg-amber-500 hover:bg-amber-600 focus:ring-amber-500': showEditMarkerModal
+                        }">
+                  <ArrowPathIcon v-if="form.processing" class="animate-spin h-5 w-5 mr-2 -ml-1" />
+                  <CheckCircleIcon v-if="!form.processing && showEditMarkerModal" class="h-5 w-5 mr-2 -ml-1" />
+                  <MapPinIcon v-if="!form.processing && !showEditMarkerModal" class="h-5 w-5 mr-2 -ml-1" />
+                  <span>{{ form.processing ? 'Saving...' : (showEditMarkerModal ? 'Save Changes' : 'Add Marker') }}</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -139,8 +145,8 @@
     description: '',
   });
   
-  const pencilSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="1em" height="1em" style="display:inline-block; vertical-align: -0.125em;"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" /></svg>`;
-  const trashSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="1em" height="1em" style="display:inline-block; vertical-align: -0.125em;"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25-.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" /></svg>`;
+  const pencilSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" /></svg>`;
+  const trashSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25-.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" /></svg>`;
   
   const openAddModal = (latlng: LatLng) => {
     form.reset();
@@ -165,6 +171,7 @@
     showAddMarkerModal.value = false;
     showEditMarkerModal.value = false;
     form.reset();
+    form.clearErrors();
     currentEditingMarker.value = null;
   };
   
@@ -186,6 +193,7 @@
     if (confirm('Are you sure you want to delete this marker?')) {
       router.delete(route('map.destroy', markerId), {
         preserveScroll: true,
+        onSuccess: () => map?.closePopup(), // Close popup after successful deletion
       });
     }
   };
@@ -198,21 +206,21 @@
       const leafletMarker = L.marker([markerData.latitude, markerData.longitude])
         .addTo(map)
         .bindPopup(`
-          <div class="text-sm">
-            <b class="font-semibold text-base">${markerData.name || 'Unnamed Marker'}</b><br>
-            <p class="my-1">${markerData.description || 'No description.'}</p>
-            <div class="mt-2">
-              <button class="edit-marker-btn inline-flex items-center space-x-1 text-xs px-2 py-1 mr-1 rounded text-white bg-blue-600 hover:bg-blue-700" data-marker-id="${markerData.id}">
+          <div class="p-3.5 bg-white rounded-lg shadow-xl border border-slate-200 min-w-[240px] text-slate-700 font-sans">
+            <strong class="block text-md font-semibold text-slate-800 mb-1.5">${markerData.name || 'Unnamed Marker'}</strong>
+            <p class="text-sm text-slate-600 mb-3 leading-relaxed">${markerData.description ? markerData.description.replace(/\n/g, '<br>') : '<em>No description.</em>'}</p>
+            <div class="mt-3 pt-3 border-t border-slate-200 flex items-center space-x-2">
+              <button class="edit-marker-btn flex-grow inline-flex items-center justify-center space-x-1.5 text-xs px-3 py-1.5 rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 focus:ring-offset-white transition-colors" data-marker-id="${markerData.id}">
                 ${pencilSVG}
                 <span>Edit</span>
               </button>
-              <button class="delete-marker-btn inline-flex items-center space-x-1 text-xs px-2 py-1 rounded text-white bg-red-600 hover:bg-red-700" data-marker-id="${markerData.id}">
+              <button class="delete-marker-btn flex-grow inline-flex items-center justify-center space-x-1.5 text-xs px-3 py-1.5 rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 focus:ring-offset-white transition-colors" data-marker-id="${markerData.id}">
                 ${trashSVG}
                 <span>Delete</span>
               </button>
             </div>
           </div>
-        `);
+        `, { className: 'custom-leaflet-popup' }); // Added custom class
       leafletMarkers.value.push(leafletMarker);
     });
   };
@@ -231,23 +239,26 @@
       map.on('popupopen', (e: PopupEvent) => {
         const popupNode = e.popup.getElement();
         if (!popupNode) return;
-        const editBtn = popupNode.querySelector('.edit-marker-btn') as HTMLElement | null;
+        
+        // Attach event listeners to buttons inside the popup
+        const editBtn = popupNode.querySelector('.edit-marker-btn');
         if (editBtn) {
-          editBtn.onclick = (event: MouseEvent) => {
+          editBtn.addEventListener('click', (event: Event) => {
             const markerId = (event.currentTarget as HTMLElement).dataset.markerId;
             const markerToEdit = props.markers.find(m => m.id === Number(markerId));
             if (markerToEdit) openEditModal(markerToEdit);
-          };
+          });
         }
-        const deleteBtn = popupNode.querySelector('.delete-marker-btn') as HTMLElement | null;
+  
+        const deleteBtn = popupNode.querySelector('.delete-marker-btn');
         if (deleteBtn) {
-          deleteBtn.onclick = (event: MouseEvent) => {
+          deleteBtn.addEventListener('click', (event: Event) => {
             const markerId = (event.currentTarget as HTMLElement).dataset.markerId;
             if (markerId) {
               deleteMarker(Number(markerId));
-              map?.closePopup();
+              // map?.closePopup(); // Moved to onSuccess of deleteMarker
             }
-          };
+          });
         }
       });
   
