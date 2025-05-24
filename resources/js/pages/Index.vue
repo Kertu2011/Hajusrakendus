@@ -45,7 +45,7 @@
         </Link>
   
         <Link href="/blog" class="bg-green-500 hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 text-center block">
-          Blogi ja kommentaarid (TODO)
+          Blogi ja kommentaarid
         </Link>
 
         <Link href="/store" class="bg-pink-500 hover:bg-pink-600 dark:bg-pink-700 dark:hover:bg-pink-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 text-center block">
