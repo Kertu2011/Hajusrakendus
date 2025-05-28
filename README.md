@@ -1,7 +1,7 @@
 # Lingid
-ilmarakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/weather
-kaardirakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/map
-blogi - https://hajusrakendus-main-sdvtix.laravel.cloud/blog
+ilmarakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/weather  
+kaardirakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/map  
+blogi - https://hajusrakendus-main-sdvtix.laravel.cloud/blog  
 
 
 # Laravel Vue Starter Kit
