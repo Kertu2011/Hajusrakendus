@@ -66,9 +66,14 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
 import { usePage } from '@inertiajs/vue3'
+import axios from 'axios';
 
 const { props } = usePage()
 const { user } = props.auth || { user: null }
+
+axios.get('/sanctum/csrf-cookie').then(() => {
+    // CSRF cookie is set, you can now make authenticated requests
+});
 
 </script>
 

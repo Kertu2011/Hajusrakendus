@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Pet;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Database\Seeders\ProductSeeder;
+use Illuminate\Support\Collection;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,14 +14,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Testing User',
+            'email' => 'user@example.com',
         ]);
+
+        /** @var Collection<int, User> $createdUsers */
+        $createdUsers = User::factory(10)->create();
+
         $this->call([
             ProductSeeder::class, // Add this line
         ]);
+
+        Pet::factory(20)->make()->each(function ($pet) use ($createdUsers) {
+            $pet->user_id = $createdUsers->random()->id;
+            $pet->save();
+        });
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PetController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\WeatherController;
@@ -46,6 +47,9 @@ Route::post('/checkout/process-payment', [CheckoutController::class, 'processPay
 
 Route::get('/payment/success', [CheckoutController::class, 'success'])->name('payment.success');
 Route::get('/payment/failure', [CheckoutController::class, 'failure'])->name('payment.failure');
+
+Route::get('/pets', [PetController::class, 'index'])->name('pets.index');
+Route::get('/pets/create', [PetController::class, 'create'])->name('pets.create');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
