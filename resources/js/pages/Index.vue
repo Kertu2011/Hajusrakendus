@@ -52,8 +52,8 @@
           E-pood
         </Link>
 
-        <Link href="/favourite-subject" class="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 text-center block">
-          Lemmikteema (TODO)
+        <Link href="/pets" class="bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1 text-center block">
+          Lemmikteema (Loomad)
         </Link>
       </div>
 
