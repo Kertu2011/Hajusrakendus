@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Pet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class PetController extends Controller
 {
@@ -16,14 +18,10 @@ class PetController extends Controller
             'offset' => 'integer|min:0',
         ]);
 
-        $pets = Pet::query()
-            ->when($request->has('limit'), function ($query) use ($validated) {
-                return $query->limit($validated['limit']);
-            })
-            ->when($request->has('offset'), function ($query) use ($validated) {
-                return $query->offset($validated['offset']);
-            })
-            ->get();
+        $limit = $validated['limit'] ?? 15;
+        $offset = $validated['offset'] ?? 0;
+
+        $pets = $this->rememberPetsCache($limit, $offset);
 
         return response()->json($pets);
     }
@@ -43,9 +41,41 @@ class PetController extends Controller
         $pet->user_id = $request->user()->id;
         $pet->save();
 
+        // Clear cache after adding a new pet
+        $this->clearPetsCache();
+
         return response()->json([
             'message' => 'Pet created successfully.',
             'pet' => $pet,
         ], 201);
+    }
+
+    private function rememberPetsCache(int $limit, int $offset, int $minutes = 60): Collection
+    {
+        $cacheKey = sprintf('pets:limit_%d:offset_%d', $limit, $offset);
+
+        $retrievePets = function () use ($limit, $offset) {
+            return Pet::query()
+                ->orderBy('created_at', 'desc') // Add explicit ordering for consistency
+                ->limit($limit)
+                ->offset($offset)
+                ->get();
+        };
+
+        if (Cache::supportsTags()) {
+            return Cache::tags(['pets'])
+                ->remember($cacheKey, now()->addMinutes($minutes), $retrievePets);
+        }
+
+        return Cache::remember($cacheKey, now()->addMinutes($minutes), $retrievePets);
+    }
+
+    private function clearPetsCache(): void
+    {
+        if (Cache::supportsTags()) {
+            Cache::tags(['pets'])->flush();
+        } else {
+            Cache::flush();
+        }
     }
 }
