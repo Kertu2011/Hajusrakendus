@@ -35,6 +35,18 @@ export type User = {
     created_at: string;
     updated_at: string;
     is_admin: boolean;
-}
+};
 
 export type BreadcrumbItemType = BreadcrumbItem;
+
+export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    image_url: string;
+}
+
+export interface CartItem extends Product {
+    quantity: number;
+}
