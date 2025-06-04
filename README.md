@@ -1,9 +1,9 @@
 # Lingid
 ilmarakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/weather  
 kaardirakendus - https://hajusrakendus-main-sdvtix.laravel.cloud/map  
-blogi - https://hajusrakendus-main-sdvtix.laravel.cloud/blog  
-e-pood -  http://localhost/products
-lemmik teema -  http://localhost/pets
+blogi - https://hajusrakendus-main-sdvtix.laravel.cloud/blog    
+e-pood - https://hajusrakendus-main-sdvtix.laravel.cloud/products  
+lemmik teema -  https://hajusrakendus-main-sdvtix.laravel.cloud/pets    
 
 
 # Laravel Vue Starter Kit
