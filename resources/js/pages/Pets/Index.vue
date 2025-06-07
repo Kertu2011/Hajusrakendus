@@ -35,8 +35,25 @@ const fetchPets = async () => {
     }
 };
 
+const fetchMonsters = async () => {
+    try {
+        const response = await axios.get('https://hajusrakendused.tak22parnoja.itmajakas.ee/current/public/index.php/api/monsters');
+        pets.value = response.data;
+    } catch (error) {
+        if (error.response.status === 401) {
+            window.location.href = '/login';
+        }
+
+        error.value = 'Failed to load monsters. Please try again later.';
+        console.error('Error fetching monsters:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
 onMounted(() => {
     fetchPets();
+    fetchMonsters();
 });
 </script>
 
