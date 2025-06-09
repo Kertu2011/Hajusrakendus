@@ -15,7 +15,17 @@ type Pet = {
     approximate_age?: string | null;
 };
 
+type Monster = {
+    id: number;
+    title: string;
+    image: string;
+    description: string;
+    habitat: string;
+    behaviour: string;
+};
+
 const pets = ref<Pet[]>([]);
+const monsters = ref<Monster[]>([]);
 const loading = ref(true);
 const error = ref(null);
 
@@ -38,7 +48,7 @@ const fetchPets = async () => {
 const fetchMonsters = async () => {
     try {
         const response = await axios.get('https://hajusrakendused.tak22parnoja.itmajakas.ee/current/public/index.php/api/monsters');
-        pets.value = response.data;
+        monsters.value = response.data;
     } catch (error) {
         if (error.response.status === 401) {
             window.location.href = '/login';
@@ -78,5 +88,20 @@ onMounted(() => {
         <div v-if="loading" class="text-center text-gray-500">Loading pets...</div>
         <div v-if="error" class="text-center text-red-500">{{ error }}</div>
         <div v-if="!loading && pets.length === 0" class="text-center text-gray-500">No pets available.</div>
+    </div>
+    <div class="container mx-auto p-4 mt-8">
+        <h1 class="text-3xl font-bold mb-4">Monsters</h1>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div v-for="monster in monsters" :key="monster.id" class="rounded-lg bg-white p-4 shadow-md text-black">
+                <img v-if="monster.image" :src="monster.image" alt="Monster" class="mb-4 h-48 w-full rounded-t-lg object-cover" />
+                <h2 class="text-xl font-semibold">{{ monster.title }}</h2>
+                <p class="text-gray-600">{{ monster.description }}</p>
+                <p class="text-sm text-gray-500">Habitat: {{ monster.habitat }}</p>
+                <p class="text-sm text-gray-500">Behaviour: {{ monster.behaviour }}</p>
+            </div>
+        </div>
+        <div v-if="loading" class="text-center text-gray-500">Loading monsters...</div>
+        <div v-if="error" class="text-center text-red-500">{{ error }}</div>
+        <div v-if="!loading && monsters.length === 0" class="text-center text-gray-500">No monsters available.</div>
     </div>
 </template>
