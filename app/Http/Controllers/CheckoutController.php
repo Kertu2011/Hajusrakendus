@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator; // Import Validator
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class CheckoutController extends Controller
 {
@@ -55,20 +57,24 @@ class CheckoutController extends Controller
      */
     public function processPayment(Request $request)
     {
-        $request->validate([
-            'status' => 'required|string|in:success,cancel',
-            // 'cart_items' and 'user_info' are passed through but not strictly re-validated here
-            // as they were validated in initiatePayment or come from trusted frontend state
+        Stripe::setApiKey('sk_test_your_test_secret_key_here'); // Use your Stripe test secret key
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => ['name' => 'Test Product'],
+                    'unit_amount' => 500, // €5.00
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('payment.success'),
+            'cancel_url' => route('payment.failure'),
         ]);
 
-        if ($request->input('status') === 'success') {
-            // No DB interaction for order needed for this mock.
-            // Cart will be cleared on the frontend (Success.vue).
-            return Redirect::route('payment.success')->with('success', 'Makse õnnestus! Teie tellimus on esitatud.');
-        } else {
-            // Products remain in cart (frontend state).
-            return Redirect::route('payment.failure')->with('error', 'Makse tühistati või ebaõnnestus. Teie tooted on endiselt ostukorvis.');
-        }
+        return redirect($session->url);
     }
 
     /**
