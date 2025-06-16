@@ -109,11 +109,9 @@ const submitCheckout = () => {
     router.post('/checkout/initiate-payment', dataToSubmit, {
         onSuccess: () => {
             formSubmittedSuccessfully.value = true;
-            // Page will navigate to MockPaymentConfirmation via controller
         },
         onError: (errors) => {
             console.error('Checkout errors:', errors);
-            // Errors are automatically available in $page.props.errors
         },
         onFinish: () => {
             isSubmitting.value = false;

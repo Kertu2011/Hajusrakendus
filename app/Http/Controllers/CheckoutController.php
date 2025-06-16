@@ -1,14 +1,13 @@
 <?php
-// app/Http/Controllers/CheckoutController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator; // Import Validator
-use Stripe\Stripe;
+use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 use Stripe\Checkout\Session;
+use Stripe\Stripe;
 
 class CheckoutController extends Controller
 {
@@ -17,68 +16,42 @@ class CheckoutController extends Controller
      */
     public function index()
     {
-        // Cart data is managed on the frontend.
-        // This controller just renders the checkout page.
         return Inertia::render('Checkout/Index');
     }
 
     /**
-     * Receives checkout form data and cart, then shows mock payment confirmation.
+     * Receives checkout form data and cart, then redirects to Stripe for payment.
      */
     public function initiatePayment(Request $request)
     {
-        // Basic validation for user data
-        // The cart_items validation is more for ensuring the structure is somewhat okay
         $validator = Validator::make($request->all(), [
             'user_info.firstName' => 'required|string|max:255',
             'user_info.lastName' => 'required|string|max:255',
             'user_info.email' => 'required|email|max:255',
             'user_info.phone' => 'required|string|max:50',
             'cart_items' => 'required|array',
-            'cart_items.*.id' => 'required|integer', // Basic check for item structure
+            'cart_items.*.id' => 'required|integer',
+            'cart_items.*.name' => 'required|string',
+            'cart_items.*.price' => 'required|numeric|min:0',
             'cart_items.*.quantity' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
-            // Redirect back with errors. Inertia will automatically handle this.
-            // Consider sending a flash message for a better UX if redirecting to a generic error page or back to form
             return Redirect::route('checkout.index')->withErrors($validator)->withInput();
         }
-
-        // No complex order persistence needed.
-        // We'll pass the submitted data to the mock payment confirmation page.
-        return Inertia::render('Checkout/MockPaymentConfirmation', [
-            'checkoutData' => $request->all(), // Contains 'user_info' and 'cart_items'
-        ]);
-    }
-
-    /**
-     * Processes the real Stripe Checkout Session.
-     */
-    public function processPayment(Request $request)
-    {
-        $request->validate([
-            'cart_items' => 'required|array',
-            'cart_items.*.name' => 'required|string',
-            'cart_items.*.price' => 'required|integer', // price in cents
-            'cart_items.*.quantity' => 'required|integer|min:1',
-            'user_info.email' => 'required|email'
-        ]);
-
-        $cartItems = $request->input('cart_items');
 
         // Set your actual Stripe test key
         Stripe::setApiKey('sk_test_51RaW5yHGluQtUOBXj6NKAXFqR5xG5yq7I0pnGLLtluF7G2hmT5MFSZpPUmTlRJMKlVXp3qGjCtq9GtOdyMPzfbbI00zqMZSN4O');
 
         $lineItems = [];
-        foreach ($cartItems as $item) {
+        foreach ($request->input('cart_items') as $item) {
             $lineItems[] = [
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
                         'name' => $item['name'],
                     ],
-                    'unit_amount' => $item['price'], // must be in cents
+                    'unit_amount' => (int)($item['price'] * 100), // Price in cents
                 ],
                 'quantity' => $item['quantity'],
             ];
@@ -93,7 +66,9 @@ class CheckoutController extends Controller
             'cancel_url' => route('payment.failure'),
         ]);
 
-        return redirect($session->url);
+        // Use Inertia::location() to perform a full-page redirect to an external website.
+        // This avoids the CORS error by not using an XMLHttpRequest for the redirect.
+        return Inertia::location($session->url);
     }
 
     /**

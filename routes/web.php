@@ -43,7 +43,6 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout/initiate-payment', [CheckoutController::class, 'initiatePayment'])->name('checkout.initiatePayment');
-Route::post('/checkout/process-payment', [CheckoutController::class, 'processPayment'])->name('checkout.processPayment');
 
 Route::get('/payment/success', [CheckoutController::class, 'success'])->name('payment.success');
 Route::get('/payment/failure', [CheckoutController::class, 'failure'])->name('payment.failure');
