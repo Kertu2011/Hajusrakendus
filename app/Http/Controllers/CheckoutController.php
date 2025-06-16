@@ -53,23 +53,42 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Processes the mock payment status (success/cancel).
+     * Processes the real Stripe Checkout Session.
      */
     public function processPayment(Request $request)
     {
-        Stripe::setApiKey('sk_test_your_test_secret_key_here'); // Use your Stripe test secret key
+        $request->validate([
+            'cart_items' => 'required|array',
+            'cart_items.*.name' => 'required|string',
+            'cart_items.*.price' => 'required|integer', // price in cents
+            'cart_items.*.quantity' => 'required|integer|min:1',
+            'user_info.email' => 'required|email'
+        ]);
+
+        $cartItems = $request->input('cart_items');
+
+        // Set your actual Stripe test key
+        Stripe::setApiKey('sk_test_51RaW5yHGluQtUOBXj6NKAXFqR5xG5yq7I0pnGLLtluF7G2hmT5MFSZpPUmTlRJMKlVXp3qGjCtq9GtOdyMPzfbbI00zqMZSN4O');
+
+        $lineItems = [];
+        foreach ($cartItems as $item) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => [
+                        'name' => $item['name'],
+                    ],
+                    'unit_amount' => $item['price'], // must be in cents
+                ],
+                'quantity' => $item['quantity'],
+            ];
+        }
 
         $session = Session::create([
             'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => ['name' => 'Test Product'],
-                    'unit_amount' => 500, // €5.00
-                ],
-                'quantity' => 1,
-            ]],
+            'line_items' => $lineItems,
             'mode' => 'payment',
+            'customer_email' => $request->input('user_info.email'),
             'success_url' => route('payment.success'),
             'cancel_url' => route('payment.failure'),
         ]);
